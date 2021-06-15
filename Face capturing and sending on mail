@@ -13,9 +13,6 @@ while True:
         x2=x1+face[0][2]
         y2=y1+face[0][3]
         a=cv2.rectangle(photo,(x1,y1),(x2,y2),[255,0,0],2)
-        
-        cphoto=photo[x1:x2,y1:y2]
-        cv2.imshow('HII!!!',a)
         cv2.waitKey(100)
         break
             
