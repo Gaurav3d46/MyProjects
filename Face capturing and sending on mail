@@ -1,0 +1,66 @@
+import cv2,smtplib, ssl
+model=cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+cap=cv2.VideoCapture(0)
+
+while True:
+    ret,photo=cap.read()
+    face=model.detectMultiScale(photo)
+    if len(face)==0:
+        pass
+    else:
+        x1=face[0][0]
+        y1=face[0][1]
+        x2=x1+face[0][2]
+        y2=y1+face[0][3]
+        a=cv2.rectangle(photo,(x1,y1),(x2,y2),[255,0,0],2)
+        
+        cphoto=photo[x1:x2,y1:y2]
+        cv2.imshow('HII!!!',a)
+        cv2.waitKey(100)
+        break
+            
+cv2.destroyAllWindows()
+cv2.imwrite('a.jpg', a)
+cap.release()
+
+if(ret):
+    import smtplib
+    from email.mime.multipart import MIMEMultipart
+    from email.mime.text import MIMEText
+    from email.mime.base import MIMEBase
+    from email import encoders
+    mail_content = 'Someone is using ur laptop'
+
+    #The mail addresses and password
+    sender_address = 'justwriteandgo@gmail.com'
+    sender_pass = 'xihvjmfomeiiukgk'
+    receiver_address = 'justwriteandgo@gmail.com'
+
+    #Setup the MIME
+    message = MIMEMultipart()
+    message['From'] = sender_address
+    message['To'] = receiver_address
+    message['Subject'] = 'A test mail sent by Python. It has an attachment.'
+
+    #The subject line
+    #The body and the attachments for the mail
+    message.attach(MIMEText(mail_content, 'plain'))
+    attach_file_name = 'a.jpg'
+    attach_file = open(attach_file_name, 'rb') # Open the file as binary mode
+    payload = MIMEBase('image', 'jpg', filename='a.jpg')
+    payload.set_payload((attach_file).read())
+    encoders.encode_base64(payload) #encode the attachment
+
+    #add payload header with filename
+    payload.add_header('Content-Decomposition', 'attachment', filename=attach_file_name)
+    message.attach(payload)
+
+
+    #Create SMTP session for sending the mail
+    session = smtplib.SMTP('smtp.gmail.com', 587) #use gmail with port
+    session.starttls() #enable security
+    session.login(sender_address, sender_pass) #login with mail_id and password
+    text = message.as_string()
+    session.sendmail(sender_address, receiver_address, text)
+    session.quit()
+    print('Mail Sent')
